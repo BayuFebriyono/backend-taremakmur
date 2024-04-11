@@ -9,18 +9,12 @@ class BarangController extends Controller
 {
     public function all()
     {
-        return response()->json([
-            'status' => true,
-            'data' => Barangs::all()
-        ]);
+        return response()->json(Barangs::all());
     }
 
     public function searchBarang($kode)
     {
-        return response()->json([
-            'status' => true,
-            'data' => Barangs::where('kode_barang', 'like', '%' . $kode . '%')->get()
-        ]);
+        return response()->json(Barangs::where('kode_barang', 'like', '%' . $kode . '%')->get());
     }
 
     public function getById($id)
