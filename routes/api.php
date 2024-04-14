@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,3 +30,6 @@ Route::get('barang/{id}', [BarangController::class, 'getById'])->middleware('jwt
 // Route Customer
 Route::get('customers', [CustomerController::class, 'all'])->middleware('jwt.verify');
 Route::get('customer/{id}', [CustomerController::class, 'getById'])->middleware('jwt.verify');
+
+// Route Order
+Route::post('order',[OrderController::class, 'createOrder'])->middleware('jwt.verify');

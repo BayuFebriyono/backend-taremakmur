@@ -19,9 +19,6 @@ class BarangController extends Controller
 
     public function getById($id)
     {
-        return response()->json([
-            'status' => true,
-            'data' => Barangs::find($id)
-        ]);
+        return response()->json(Barangs::find($id));
     }
 }
