@@ -19,17 +19,21 @@ class OrderController extends Controller
             'customer_id' => $request->customer_id,
             'no_invoice' => $noInvoice,
             'keterangan' => $request->keterangan,
-            'jenis_pembayaran' => $request->jenis_pembayaran /**kredit atau tunai**/,
+            'jenis_pembayaran' => $request->jenis_pembayaran
+            /**kredit atau tunai**/
+            ,
             'uang_muka' => $request->uang_muka,
             'lunas' => $request->lunas,
             'status' => 'WAITING'
         ]);
 
         $confirmedBarang = collect($request->data);
+
         $confirmedBarang = $confirmedBarang->map(function ($item) use ($noInvoice) {
             $item['no_invoice'] = $noInvoice;
             return $item;
         });
+
 
         $confirmedBarang->each(function ($item) {
             $barang = Barang::where('kode_barang', $item['kode_barang'])->first();
@@ -49,6 +53,21 @@ class OrderController extends Controller
             'success' => true,
             'message' => 'Order berhasil dibuat dengan no invoice ' . $noInvoice
         ]);
+    }
+
+
+    public function listOrder()
+    {
+        $header = HeaderPenjualan::where('status', 'WAITING')
+                    ->with(['user', 'customer', 'detail_penjualan'])
+                    ->get();
+        $header->each(function($item){
+            $hargaTotal = $item->detail_penjualan->sum('harga');
+            unset($item['detail_penjualan']);
+            $item['total_harga'] = $hargaTotal;
+        });
+
+    return response()->json($header);
     }
 
 
