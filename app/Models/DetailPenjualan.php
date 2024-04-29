@@ -8,9 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class DetailPenjualan extends Model
 {
-    use HasFactory,HasUuids;
+    use HasFactory, HasUuids;
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $table = 'detail_penjualans';
+
+    public function barang()
+    {
+        return $this->belongsTo(Barang::class, 'kode_barang', 'kode_barang');
+    }
 }

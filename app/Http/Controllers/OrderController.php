@@ -6,6 +6,7 @@ use App\Models\Barang;
 use App\Models\DetailPenjualan;
 use Illuminate\Http\Request;
 use App\Models\HeaderPenjualan;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -59,15 +60,42 @@ class OrderController extends Controller
     public function listOrder()
     {
         $header = HeaderPenjualan::where('status', 'WAITING')
-                    ->with(['user', 'customer', 'detail_penjualan'])
-                    ->get();
-        $header->each(function($item){
+            ->with(['user', 'customer', 'detail_penjualan'])
+            ->get();
+        $header->each(function ($item) {
             $hargaTotal = $item->detail_penjualan->sum('harga');
             unset($item['detail_penjualan']);
             $item['total_harga'] = $hargaTotal;
         });
 
-    return response()->json($header);
+        return response()->json($header);
+    }
+
+    public function generatePdf($no_invoice)
+    {
+        $data = HeaderPenjualan::where('no_invoice', $no_invoice)
+            ->with([
+                'detail_penjualan' => function ($query) {
+                    $query->with('barang')->orderBy('jenis_barang');
+                },
+                'user'
+            ])
+            ->first();
+
+        // Buat PDF
+        $pdf = Pdf::loadView('print.nota-penjualan', ['data' => $data])->setPaper([0, 0, 226.772, 600])->output();
+
+        // Simpan PDF ke direktori public/temp_pdf dengan nama yang unik
+        $pdfFileName = uniqid('nota_penjualan_') . '.pdf';
+        $pdfFilePath = public_path('temp_pdf/' . $pdfFileName);
+        file_put_contents($pdfFilePath, $pdf);
+
+        // Update status sudah_cetak di database
+        HeaderPenjualan::where('no_invoice', $no_invoice)->update(['sudah_cetak' => true]);
+
+        // Return link publik ke file PDF
+        $publicPdfUrl = url('temp_pdf/' . $pdfFileName);
+        return response()->json(['pdf_url' => $publicPdfUrl]);
     }
 
 

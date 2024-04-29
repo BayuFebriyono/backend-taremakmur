@@ -34,3 +34,6 @@ Route::get('customer/{id}', [CustomerController::class, 'getById'])->middleware(
 // Route Order
 Route::post('order',[OrderController::class, 'createOrder'])->middleware('jwt.verify');
 Route::get('/list-order', [OrderController::class, 'listOrder'])->middleware('jwt.verify');
+
+// Generate Pdf
+Route::get('/generate-pdf/{no_invoice}',[OrderController::class, 'generatePdf'])->middleware('jwt.verify');
