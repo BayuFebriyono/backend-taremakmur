@@ -90,8 +90,7 @@ class OrderController extends Controller
         $pdfFilePath = public_path('temp_pdf/' . $pdfFileName);
         file_put_contents($pdfFilePath, $pdf);
 
-        // Update status sudah_cetak di database
-        HeaderPenjualan::where('no_invoice', $no_invoice)->update(['sudah_cetak' => true]);
+        
 
         // Return link publik ke file PDF
         $publicPdfUrl = url('temp_pdf/' . $pdfFileName);
